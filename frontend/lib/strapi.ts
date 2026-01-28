@@ -1,18 +1,20 @@
-const STRAPI_URL = process.env.STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL =
+  process.env.NEXT_PUBLIC_STRAPI_URL ||
+  "http://localhost:1337";
 
 export async function getStrapiData(path: string) {
   try {
-    const response = await fetch(`${STRAPI_URL}${path}`, {
-      cache: "no-store", // important for dynamic Strapi content
+    const res = await fetch(`${STRAPI_URL}${path}`, {
+      cache: "no-store",
     });
 
-    if (!response.ok) {
-      throw new Error(`Strapi fetch failed: ${response.status}`);
+    if (!res.ok) {
+      throw new Error("Failed to fetch Strapi data");
     }
 
-    return await response.json();
+    return res.json();
   } catch (error) {
-    console.error("Strapi Error:", error);
+    console.error("Strapi fetch error:", error);
     return null;
   }
 }
