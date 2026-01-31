@@ -1,8 +1,12 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    turbo: false, // 🔥 FORCE OFF
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.media.strapiapp.com",
+      },
+    ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
