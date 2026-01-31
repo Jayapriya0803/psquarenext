@@ -1,20 +1,29 @@
-const STRAPI_URL =
-  process.env.NEXT_PUBLIC_STRAPI_URL ||
-  "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
-export async function getStrapiData(path: string) {
-  try {
-    const res = await fetch(`${STRAPI_URL}${path}`, {
+export async function getHomePage() {
+  const res = await fetch(
+    `${STRAPI_URL}/api/home-page?populate[blocks][on][layout.hero-section][populate][image][fields][0]=url&populate[blocks][on][layout.hero-section][populate][image][fields][1]=alternativeText&populate[blocks][on][layout.hero-section][populate][link][populate]=true`,
+    {
       cache: "no-store",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch Strapi data");
     }
+  );
 
-    return res.json();
-  } catch (error) {
-    console.error("Strapi fetch error:", error);
-    return null;
+  if (!res.ok) {
+    throw new Error("Failed to fetch home page");
   }
+
+  return res.json();
+}
+
+// 👇 ADD THIS
+export async function getAboutUs() {
+  const res = await fetch(`${STRAPI_URL}/api/about-us?populate=*`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch About Us");
+  }
+
+  return res.json();
 }

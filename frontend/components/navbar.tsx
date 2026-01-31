@@ -66,7 +66,7 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8 text-sm">
           <Link href="/" className={linkClass("/")}>Home</Link>
-          <Link href="/aboutus" className={linkClass("/aboutus")}>About</Link>
+          <Link href="/about" className={linkClass("/about")}>About</Link>
           <Link href="/product" className={linkClass("/product")}>Products</Link>
           <Link href="/customer" className={linkClass("/customer")}>Clients</Link>
           <Link href="/contactus" className={linkClass("/contactus")}>Contact</Link>
@@ -107,7 +107,7 @@ const Navbar = () => {
         <div className="md:hidden bg-white shadow-lg rounded-b-xl px-6 py-6 space-y-4 text-center">
           {[
             ["/", "Home"],
-            ["/aboutus", "About"],
+            ["/about", "About"],
             ["/product", "Products"],
             ["/customer", "Clients"],
             ["/contactus", "Contact"],
