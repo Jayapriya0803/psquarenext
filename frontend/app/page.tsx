@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getHomePage } from "@/lib/strapi";
+import { getHomePage } from "@/lib/home";
 
 export default async function HomePage() {
   const response = await getHomePage();
@@ -12,20 +12,32 @@ export default async function HomePage() {
     return <div className="p-10">Hero not found</div>;
   }
 
-  // ✅ Absolute Strapi image URL
-  const imageUrl: string | undefined = hero.image?.url
-    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${hero.image.url}`
+  /**
+   * ✅ Supports BOTH Strapi v5 image shapes:
+   * - hero.image.url
+   * - hero.image.data.attributes.url
+   */
+  const imagePath =
+    hero.image?.url ||
+    hero.image?.data?.attributes?.url;
+
+  const imageUrl = imagePath
+    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${imagePath}`
     : undefined;
 
   return (
     <main>
-      <section className="relative min-h-[80vh] flex items-center">
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         
         {/* BACKGROUND IMAGE */}
         {imageUrl && (
           <Image
             src={imageUrl}
-            alt={hero.image?.alternativeText || hero.heading}
+            alt={
+              hero.image?.alternativeText ||
+              hero.image?.data?.attributes?.alternativeText ||
+              hero.heading
+            }
             fill
             className="object-cover"
             priority
@@ -33,13 +45,11 @@ export default async function HomePage() {
           />
         )}
 
-        {/* DARK OVERLAY */}
+        {/* OVERLAY */}
         <div className="absolute inset-0 bg-black/40" />
 
         {/* CONTENT */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center text-white">
-          
-          {/* TEXT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold">
               {hero.heading}
@@ -49,7 +59,6 @@ export default async function HomePage() {
               {hero.subheading}
             </p>
           </div>
-
         </div>
       </section>
     </main>
