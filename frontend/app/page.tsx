@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getHomePage } from "@/lib/home";
+import { getStrapiMediaUrl } from "@/lib/getStrapiMediaUrl";
 
 export default async function HomePage() {
   const response = await getHomePage();
@@ -12,24 +13,16 @@ export default async function HomePage() {
     return <div className="p-10">Hero not found</div>;
   }
 
-  /**
-   * ✅ Supports BOTH Strapi v5 image shapes:
-   * - hero.image.url
-   * - hero.image.data.attributes.url
-   */
   const imagePath =
     hero.image?.url ||
     hero.image?.data?.attributes?.url;
 
-  const imageUrl = imagePath
-    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${imagePath}`
-    : undefined;
+  // ✅ SAFE FOR LOCAL + STRAPI CLOUD + VERCEL
+  const imageUrl = getStrapiMediaUrl(imagePath);
 
   return (
     <main>
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
-        
-        {/* BACKGROUND IMAGE */}
         {imageUrl && (
           <Image
             src={imageUrl}
@@ -45,10 +38,8 @@ export default async function HomePage() {
           />
         )}
 
-        {/* OVERLAY */}
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* CONTENT */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center text-white">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold">
