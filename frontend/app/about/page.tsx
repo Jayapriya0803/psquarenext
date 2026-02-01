@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getAboutUs } from "@/lib/strapi";
+import { getAboutUs } from "@/lib/about";
 
 export default async function AboutPage() {
   const response = await getAboutUs();
