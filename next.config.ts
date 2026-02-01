@@ -3,7 +3,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.media.strapiapp.com",
+        hostname: "mindful-flame-5c745d4a25.media.strapiapp.com",
       },
     ],
   },
