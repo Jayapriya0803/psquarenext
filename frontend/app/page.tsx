@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getHomePage } from "@/lib/home";
 import { getStrapiMediaUrl } from "@/lib/getStrapiMediaUrl";
+import GoogleReviews from "@/components/googlereview";
+import Footer from "@/components/footer"; 
 
 export default async function HomePage() {
   const response = await getHomePage();
@@ -17,12 +19,13 @@ export default async function HomePage() {
     hero.image?.url ||
     hero.image?.data?.attributes?.url;
 
-  // ✅ SAFE FOR LOCAL + STRAPI CLOUD + VERCEL
   const imageUrl = getStrapiMediaUrl(imagePath);
 
   return (
     <main>
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+      {/* HERO */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        {/* BACKGROUND IMAGE */}
         {imageUrl && (
           <Image
             src={imageUrl}
@@ -38,20 +41,33 @@ export default async function HomePage() {
           />
         )}
 
-        <div className="absolute inset-0 bg-black/40" />
+        {/* BLUE GRADIENT OVERLAY */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0E5AA7]/80 via-[#1E78C8]/70 to-[#0B3C6F]/80" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center text-white">
+        {/* SOFT INDUSTRIAL PATTERN */}
+        <div className="absolute inset-0 opacity-15 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:32px_32px]" />
+
+        {/* CONTENT */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 grid md:grid-cols-2 gap-12 items-center text-white">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               {hero.heading}
             </h1>
 
-            <p className="mt-6 text-lg text-gray-200">
+            <p className="mt-6 text-lg text-blue-100">
               {hero.subheading}
             </p>
           </div>
         </div>
       </section>
+
+      {/* GOOGLE REVIEWS */}
+      <section>
+        <GoogleReviews />
+      </section>
+
+      {/* FOOTER */}
+      <Footer />
     </main>
   );
 }
