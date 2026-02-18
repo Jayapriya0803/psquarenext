@@ -3,38 +3,40 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
+/* ---------- Image URL Fix (works for local + cloud) ---------- */
+function getImageUrl(product: any) {
+  const url = product?.image?.url;
+
+  if (!url) return "/placeholder.png";
+
+  // If Strapi Cloud already gives full URL
+  if (url.startsWith("http")) return url;
+
+  // Local Strapi
+  return `${process.env.NEXT_PUBLIC_STRAPI_URL}${url}`;
+}
+
+/* ---------- Convert Strapi RichText → Plain Text ---------- */
+function getDescription(desc: any) {
+  if (!desc) return "";
+
+  try {
+    return desc
+      .map((block: any) =>
+        block.children.map((child: any) => child.text).join("")
+      )
+      .join(" ");
+  } catch {
+    return "";
+  }
+}
+
 export default function ProductCard({ product }: any) {
   const [qty, setQty] = useState(0);
 
-  /* ---------------- IMAGE FIX ----------------
-     Strapi Cloud returns:
-     product.image.data.attributes.url
-  --------------------------------------------- */
+  const image = getImageUrl(product);
 
-  const image =
-    product?.image?.data?.attributes?.url
-      ? process.env.NEXT_PUBLIC_STRAPI_URL +
-        product.image.data.attributes.url
-      : "/placeholder.png";
-
-  /* -------- Convert Strapi RichText to text -------- */
-
-  function getDescription(desc: any) {
-    if (!desc) return "";
-
-    try {
-      return desc
-        .map((block: any) =>
-          block.children.map((child: any) => child.text).join("")
-        )
-        .join(" ");
-    } catch {
-      return "";
-    }
-  }
-
-  /* -------- Load cart quantity -------- */
-
+  /* ---------- Load cart quantity ---------- */
   useEffect(() => {
     try {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -45,10 +47,9 @@ export default function ProductCard({ product }: any) {
     }
   }, [product.id]);
 
-  /* -------- Update Cart -------- */
-
+  /* ---------- Update cart ---------- */
   function updateCart(newQty: number) {
-    let cart = [];
+    let cart: any[] = [];
 
     try {
       cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -89,12 +90,10 @@ export default function ProductCard({ product }: any) {
     if (qty > 0) updateCart(qty - 1);
   }
 
-  /* ---------------- UI ---------------- */
-
+  /* ---------- UI ---------- */
   return (
     <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition relative">
 
-      {/* IMAGE (STRAPI CLOUD SAFE) */}
       <Image
         src={image}
         alt={product.title}
@@ -104,22 +103,18 @@ export default function ProductCard({ product }: any) {
         className="rounded-lg object-cover w-full h-32"
       />
 
-      {/* TITLE */}
       <h3 className="mt-2 text-sm font-semibold line-clamp-2">
         {product.title}
       </h3>
 
-      {/* DESCRIPTION */}
       <p className="text-xs text-gray-500 mt-1 line-clamp-2">
         {getDescription(product.description)}
       </p>
 
-      {/* UNIT */}
       <p className="text-xs text-gray-500">
         {product.unit || "1 pair"}
       </p>
 
-      {/* PRICE + BUTTON */}
       <div className="flex items-center justify-between mt-2">
         <p className="font-bold text-green-700">₹{product.price}</p>
 

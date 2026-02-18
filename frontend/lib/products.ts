@@ -1,8 +1,22 @@
+import qs from "qs";
+
 const STRAPI = process.env.NEXT_PUBLIC_STRAPI_URL!;
 
 export async function getProducts() {
   try {
-    const res = await fetch(`${STRAPI}/api/products?populate=*`, {
+    // Proper populate query for Strapi v5 media
+    const query = qs.stringify(
+      {
+        populate: {
+          image: {
+            fields: ["url", "alternativeText"],
+          },
+        },
+      },
+      { encodeValuesOnly: true }
+    );
+
+    const res = await fetch(`${STRAPI}/api/products?${query}`, {
       cache: "no-store",
     });
 
@@ -12,8 +26,7 @@ export async function getProducts() {
 
     const json = await res.json();
 
-    // Strapi returns: { data: [...] }
-    return json.data;
+    return json.data || [];
   } catch (error) {
     console.error("PRODUCT FETCH ERROR:", error);
     return [];
