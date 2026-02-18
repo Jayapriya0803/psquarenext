@@ -1,39 +1,30 @@
-import { cookies } from "next/headers";
+import { getProducts } from "@/lib/products";
+import ProductCard from "./product-card";
+import CategoryBar from "./category-bar";
 
 export default async function ProductPage() {
-  // Next 16 requires await
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token");
+  const products = await getProducts();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 p-6">
-      <div className="bg-white shadow-xl rounded-2xl p-10 text-center max-w-lg w-full space-y-4">
+    <div className="bg-gray-50 min-h-screen">
 
-        <h1 className="text-3xl font-bold text-gray-800">
-          🚧 Coming Soon
-        </h1>
+      {/* Top Header */}
+      <div className="sticky top-0 bg-white z-20 shadow-sm p-4">
+        <h1 className="text-2xl font-bold">PSquare Store</h1>
+        <input
+          className="mt-3 w-full border rounded-xl px-4 py-3"
+          placeholder="Search gloves..."
+        />
+      </div>
 
-        <p className="text-gray-600 text-lg">
-          Our products page is under construction.
-        </p>
+      {/* Categories */}
+      <CategoryBar />
 
-        <p className="text-gray-500">
-          We are preparing something special for you.
-          Please check back shortly!
-        </p>
-
-        <div className="mt-6 p-4 rounded-lg bg-green-100 text-green-700">
-          {token
-            ? "You are successfully logged in ✅"
-            : "You are not logged in ❌"}
-        </div>
-
-        <a
-          href="/"
-          className="inline-block mt-4 bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition"
-        >
-          Go to Home
-        </a>
+      {/* Products */}
+      <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {products.map((product: any) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
     </div>
   );
