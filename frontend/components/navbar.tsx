@@ -60,6 +60,7 @@ const Navbar = () => {
           <Image src="/logo.png" alt="P Square" width={55} height={55} />
           <span className="text-xl font-bold text-gray-900">
             P Square Enterprises
+            P Square Enterprises.
           </span>
         </Link>
 

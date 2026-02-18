@@ -1,1 +1,5 @@
 @import "tailwindcss";
+/* Radix select fix */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
