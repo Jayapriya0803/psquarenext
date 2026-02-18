@@ -1,25 +1,60 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function ProductCard({ product }: any) {
   const [qty, setQty] = useState(0);
 
-  // build image url safely
+  /* ---------------- IMAGE FIX ----------------
+     Strapi Cloud returns:
+     product.image.data.attributes.url
+  --------------------------------------------- */
+
   const image =
-    product?.image?.url
-      ? process.env.NEXT_PUBLIC_STRAPI_URL + product.image.url
+    product?.image?.data?.attributes?.url
+      ? process.env.NEXT_PUBLIC_STRAPI_URL +
+        product.image.data.attributes.url
       : "/placeholder.png";
 
-  // load saved cart quantity (page refresh persistence)
+  /* -------- Convert Strapi RichText to text -------- */
+
+  function getDescription(desc: any) {
+    if (!desc) return "";
+
+    try {
+      return desc
+        .map((block: any) =>
+          block.children.map((child: any) => child.text).join("")
+        )
+        .join(" ");
+    } catch {
+      return "";
+    }
+  }
+
+  /* -------- Load cart quantity -------- */
+
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existing = cart.find((item: any) => item.id === product.id);
-    if (existing) setQty(existing.qty);
+    try {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existing = cart.find((item: any) => item.id === product.id);
+      if (existing) setQty(existing.qty);
+    } catch {
+      setQty(0);
+    }
   }, [product.id]);
 
+  /* -------- Update Cart -------- */
+
   function updateCart(newQty: number) {
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    let cart = [];
+
+    try {
+      cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    } catch {
+      cart = [];
+    }
 
     const existingIndex = cart.findIndex((item: any) => item.id === product.id);
 
@@ -29,7 +64,7 @@ export default function ProductCard({ product }: any) {
       const itemData = {
         id: product.id,
         name: product.title,
-        description: product.description,
+        description: getDescription(product.description),
         price: product.price,
         image,
         qty: newQty,
@@ -54,13 +89,18 @@ export default function ProductCard({ product }: any) {
     if (qty > 0) updateCart(qty - 1);
   }
 
+  /* ---------------- UI ---------------- */
+
   return (
     <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition relative">
 
-      {/* IMAGE (LOCALHOST SAFE) */}
-      <img
+      {/* IMAGE (STRAPI CLOUD SAFE) */}
+      <Image
         src={image}
         alt={product.title}
+        width={300}
+        height={300}
+        unoptimized
         className="rounded-lg object-cover w-full h-32"
       />
 
@@ -68,10 +108,11 @@ export default function ProductCard({ product }: any) {
       <h3 className="mt-2 text-sm font-semibold line-clamp-2">
         {product.title}
       </h3>
-       {/* DESCRIPTION */}
-      <h5 className="mt-2 text-sm font-semibold line-clamp-2">
-        {product.description}
-      </h5>
+
+      {/* DESCRIPTION */}
+      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+        {getDescription(product.description)}
+      </p>
 
       {/* UNIT */}
       <p className="text-xs text-gray-500">
