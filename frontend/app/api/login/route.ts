@@ -27,12 +27,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // ⭐ create login cookie session
-    const response = NextResponse.json({ success: true });
+    // ⭐ IMPORTANT: send user + jwt to frontend
+    const response = NextResponse.json({
+      success: true,
+      jwt: data.jwt,
+      user: data.user,
+    });
 
+    // also keep secure cookie session
     response.cookies.set("token", data.jwt, {
       httpOnly: true,
-      secure: false, // true only in production
+      secure: false,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,

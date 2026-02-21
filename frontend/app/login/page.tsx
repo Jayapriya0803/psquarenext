@@ -3,9 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useCartStore } from "../store/cartStore";
+import { useAuthPopup } from "../store/authPopupStore";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  // close cart overlay
+  const { closeCart } = useCartStore();
+  // close login popup
+  const { close } = useAuthPopup();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -14,36 +21,49 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ identifier, password }),
-      });
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ identifier, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.message || "Invalid email or password");
-        setLoading(false);
-        return;
-      }
-
-      router.push("/product");
-      router.refresh();
-    } catch {
-      setError("Server is not responding. Please try again.");
+    if (!res.ok) {
+      setError(data.message || "Invalid email or password");
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    /* ---------------- VERY IMPORTANT ---------------- */
+    // Save auth session for Navbar
+    localStorage.setItem("token", data.jwt);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("loginTime", Date.now().toString());
+
+    // 🔔 notify navbar instantly
+    window.dispatchEvent(new Event("userLoggedIn"));
+
+    /* --------- CLEAR OVERLAYS -------- */
+    closeCart();
+    close();
+
+    /* ---------------- REDIRECT ---------------- */
+    router.replace("/product");
+
+  } catch {
+    setError("Server is not responding. Please try again.");
   }
 
+  setLoading(false);
+}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4">
 

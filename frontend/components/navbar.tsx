@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FaTimes, FaBars } from "react-icons/fa";
 import Image from "next/image";
 
-const SESSION_EXPIRY = 5 * 60 * 1000;
+const SESSION_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,38 +15,69 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  /* ---------------- LOGOUT ---------------- */
   const handleLogout = () => {
-    localStorage.clear();
+    // clear auth only
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("loginTime");
+
     setUser(null);
+
+    // notify whole app
     window.dispatchEvent(new Event("userLoggedOut"));
-    router.push("/login");
+
+    // redirect
+    router.replace("/login");
   };
 
+  /* ---------------- SESSION CHECK ---------------- */
+  const checkSession = () => {
+    const savedUser = localStorage.getItem("user");
+    const loginTime = localStorage.getItem("loginTime");
+
+    // not logged in
+    if (!savedUser || !loginTime) {
+      setUser(null);
+      return;
+    }
+
+    // session expired
+    if (Date.now() - Number(loginTime) > SESSION_EXPIRY) {
+      handleLogout();
+      return;
+    }
+
+    // safe parse
+    try {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("loginTime");
+      setUser(null);
+    }
+  };
+
+  /* ---- CHECK ON PAGE CHANGE ---- */
   useEffect(() => {
-    const checkSession = () => {
-      const savedUser = localStorage.getItem("user");
-      const loginTime = localStorage.getItem("loginTime");
-
-      if (!savedUser || !loginTime) return setUser(null);
-
-      if (Date.now() - Number(loginTime) > SESSION_EXPIRY) {
-        handleLogout();
-        return;
-      }
-
-      setUser(JSON.parse(savedUser));
-    };
-
     checkSession();
+  }, [pathname]);
+
+  /* ---- LISTEN GLOBAL EVENTS ---- */
+  useEffect(() => {
     window.addEventListener("userLoggedIn", checkSession);
     window.addEventListener("userLoggedOut", checkSession);
+    window.addEventListener("focus", checkSession);
 
     return () => {
       window.removeEventListener("userLoggedIn", checkSession);
       window.removeEventListener("userLoggedOut", checkSession);
+      window.removeEventListener("focus", checkSession);
     };
   }, []);
 
+  /* ---------------- ACTIVE LINK STYLE ---------------- */
   const linkClass = (path: string) =>
     pathname === path
       ? "text-green-600 font-semibold"
@@ -55,6 +86,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 backdrop-blur bg-white/90 shadow-sm">
       <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo.png" alt="P Square" width={55} height={55} />
@@ -68,14 +100,14 @@ const Navbar = () => {
           <Link href="/" className={linkClass("/")}>Home</Link>
           <Link href="/about" className={linkClass("/about")}>About</Link>
           <Link href="/product" className={linkClass("/product")}>Products</Link>
-          <Link href="/customer" className={linkClass("/customer")}>Clients</Link>
           <Link href="/contactus" className={linkClass("/contactus")}>Contact</Link>
 
           {user ? (
             <div className="flex items-center gap-4">
               <span className="text-green-600 font-medium">
-                Hi, {user.username}
+                Welcome, {user.username}
               </span>
+
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
@@ -93,7 +125,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Button */}
+        {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="md:hidden text-2xl text-gray-700"
@@ -109,7 +141,6 @@ const Navbar = () => {
             ["/", "Home"],
             ["/about", "About"],
             ["/product", "Products"],
-            ["/customer", "Clients"],
             ["/contactus", "Contact"],
           ].map(([path, label]) => (
             <Link
@@ -126,14 +157,15 @@ const Navbar = () => {
             {user ? (
               <>
                 <p className="text-green-600 font-semibold mb-2">
-                  {user.username}
+                  Welcome, {user.username}
                 </p>
+
                 <button
                   onClick={() => {
                     handleLogout();
                     setMenuOpen(false);
                   }}
-                  className="w-full py-2 rounded-lg bg-red-500 text-white"
+                  className="w-full py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
                 >
                   Logout
                 </button>
@@ -141,7 +173,7 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/login"
-                className="block w-full py-2 rounded-lg bg-green-600 text-white"
+                className="block w-full py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
                 onClick={() => setMenuOpen(false)}
               >
                 Login

@@ -1,6 +1,7 @@
 import { getProducts } from "@/lib/products";
 import ProductCard from "./product-card";
 import CategoryBar from "./category-bar";
+import CartIcon from "@/components/cartIcon";
 
 export default async function ProductPage() {
   const products = await getProducts();
@@ -10,7 +11,14 @@ export default async function ProductPage() {
 
       {/* Top Header */}
       <div className="sticky top-0 bg-white z-20 shadow-sm p-4">
-        <h1 className="text-2xl font-bold">PSquare Store</h1>
+
+        {/* Row: title + cart */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">PSquare Store</h1>
+          <CartIcon />
+        </div>
+
+        {/* Search */}
         <input
           className="mt-3 w-full border rounded-xl px-4 py-3"
           placeholder="Search gloves..."

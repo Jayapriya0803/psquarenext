@@ -1,25 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useCartStore } from "../store/cartStore";
+import { useAuthPopup } from "../store/authPopupStore";
 
-/* ---------- Image URL Fix (works for local + cloud) ---------- */
+/* ---------- Image URL ---------- */
 function getImageUrl(product: any) {
   const url = product?.image?.url;
-
   if (!url) return "/placeholder.png";
-
-  // If Strapi Cloud already gives full URL
   if (url.startsWith("http")) return url;
-
-  // Local Strapi
   return `${process.env.NEXT_PUBLIC_STRAPI_URL}${url}`;
 }
 
-/* ---------- Convert Strapi RichText → Plain Text ---------- */
+/* ---------- Description ---------- */
 function getDescription(desc: any) {
   if (!desc) return "";
-
   try {
     return desc
       .map((block: any) =>
@@ -32,67 +27,54 @@ function getDescription(desc: any) {
 }
 
 export default function ProductCard({ product }: any) {
-  const [qty, setQty] = useState(0);
-
   const image = getImageUrl(product);
 
-  /* ---------- Load cart quantity ---------- */
-  useEffect(() => {
-    try {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const existing = cart.find((item: any) => item.id === product.id);
-      if (existing) setQty(existing.qty);
-    } catch {
-      setQty(0);
-    }
-  }, [product.id]);
+  const { items, addItem, increase, decrease } = useCartStore();
+  const popup = useAuthPopup();
 
-  /* ---------- Update cart ---------- */
-  function updateCart(newQty: number) {
-    let cart: any[] = [];
+  const cartItem = items.find((i) => i.id === product.id);
+  const qty = cartItem?.qty || 0;
 
-    try {
-      cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    } catch {
-      cart = [];
-    }
+  const itemData = {
+    id: product.id,
+    name: product.title,
+    description: getDescription(product.description),
+    price: product.price,
+    image,
+    qty: 1,
+  };
 
-    const existingIndex = cart.findIndex((item: any) => item.id === product.id);
+  /* ---------- LOGIN CHECK ---------- */
+  function requireLogin() {
+    const token = localStorage.getItem("token");
 
-    if (newQty === 0) {
-      if (existingIndex !== -1) cart.splice(existingIndex, 1);
-    } else {
-      const itemData = {
-        id: product.id,
-        name: product.title,
-        description: getDescription(product.description),
-        price: product.price,
-        image,
-        qty: newQty,
-      };
-
-      if (existingIndex !== -1) {
-        cart[existingIndex] = itemData;
-      } else {
-        cart.push(itemData);
-      }
+    // NOT LOGGED IN
+    if (!token) {
+      popup.open("Please login to continue shopping");
+      return false;
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    setQty(newQty);
+    return true;
   }
 
-  function add() {
-    updateCart(qty + 1);
+  /* ---------- ACTIONS ---------- */
+  function handleAdd() {
+    if (!requireLogin()) return;
+    addItem(itemData);
   }
 
-  function remove() {
-    if (qty > 0) updateCart(qty - 1);
+  function handleIncrease() {
+    if (!requireLogin()) return;
+    increase(product.id);
   }
 
-  /* ---------- UI ---------- */
+  function handleDecrease() {
+    if (!requireLogin()) return;
+    decrease(product.id);
+  }
+
   return (
-    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition relative">
+    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition">
 
       <Image
         src={image}
@@ -111,16 +93,12 @@ export default function ProductCard({ product }: any) {
         {getDescription(product.description)}
       </p>
 
-      <p className="text-xs text-gray-500">
-        {product.unit || "1 pair"}
-      </p>
-
       <div className="flex items-center justify-between mt-2">
         <p className="font-bold text-green-700">₹{product.price}</p>
 
         {qty === 0 ? (
           <button
-            onClick={add}
+            onClick={handleAdd}
             className="border border-green-600 text-green-700 px-4 py-1 rounded-lg text-sm font-semibold hover:bg-green-50"
           >
             ADD
@@ -128,7 +106,7 @@ export default function ProductCard({ product }: any) {
         ) : (
           <div className="flex items-center border border-green-600 rounded-lg overflow-hidden">
             <button
-              onClick={remove}
+              onClick={handleDecrease}
               className="px-3 py-1 text-green-700 hover:bg-green-50"
             >
               −
@@ -137,7 +115,7 @@ export default function ProductCard({ product }: any) {
             <span className="px-3 font-semibold">{qty}</span>
 
             <button
-              onClick={add}
+              onClick={handleIncrease}
               className="px-3 py-1 text-green-700 hover:bg-green-50"
             >
               +

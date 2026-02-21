@@ -3,3 +3,30 @@
 [data-radix-popper-content-wrapper] {
   z-index: 9999 !important;
 }
+/* right drawer animation */
+@keyframes slideFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.cart-slide {
+  animation: slideFromRight 0.25s ease-out;
+}
+
+/* top floating bar animation */
+@keyframes slideFromTop {
+  from {
+    transform: translate(-50%, -40px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+.top-cart-animate {
+  animation: slideFromTop 0.25s ease-out;
+}
