@@ -4,6 +4,24 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    let identifier: string = body.identifier || "";
+    const password: string = body.password || "";
+
+    // ---- FIX 1: remove accidental spaces ----
+    identifier = identifier.trim();
+
+    // ---- FIX 2: normalize username/email ----
+    // if email -> lowercase
+    // if username -> also lowercase (Strapi usernames are case-sensitive)
+    identifier = identifier.toLowerCase();
+
+    if (!identifier || !password) {
+      return NextResponse.json(
+        { message: "Username/Email and password required" },
+        { status: 400 }
+      );
+    }
+
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/local`,
       {
@@ -12,8 +30,8 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: body.identifier,
-          password: body.password,
+          identifier: identifier,
+          password: password,
         }),
       }
     );
@@ -27,14 +45,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // ⭐ IMPORTANT: send user + jwt to frontend
+    // ⭐ send user + jwt to frontend
     const response = NextResponse.json({
       success: true,
       jwt: data.jwt,
       user: data.user,
     });
 
-    // also keep secure cookie session
+    // (UNCHANGED — your session settings kept exactly)
     response.cookies.set("token", data.jwt, {
       httpOnly: true,
       secure: false,
@@ -45,6 +63,7 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
+    console.error("LOGIN ERROR:", error);
     return NextResponse.json(
       { message: "Login server error" },
       { status: 500 }

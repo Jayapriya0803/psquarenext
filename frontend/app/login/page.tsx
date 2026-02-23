@@ -21,49 +21,56 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ identifier, password }),
-    });
+    // 🔧 normalize input (IMPORTANT)
+    let cleanIdentifier = identifier.trim().toLowerCase();
 
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: cleanIdentifier,
+          password,
+        }),
+      });
 
-    if (!res.ok) {
-      setError(data.message || "Invalid email or password");
-      setLoading(false);
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Invalid username/email or password");
+        setLoading(false);
+        return;
+      }
+
+      /* ---------------- VERY IMPORTANT ---------------- */
+      // Save auth session for Navbar
+      localStorage.setItem("token", data.jwt);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("loginTime", Date.now().toString());
+
+      // 🔔 notify navbar instantly
+      window.dispatchEvent(new Event("userLoggedIn"));
+
+      /* --------- CLEAR OVERLAYS -------- */
+      closeCart();
+      close();
+
+      /* ---------------- REDIRECT ---------------- */
+      router.replace("/product");
+
+    } catch {
+      setError("Server is not responding. Please try again.");
     }
 
-    /* ---------------- VERY IMPORTANT ---------------- */
-    // Save auth session for Navbar
-    localStorage.setItem("token", data.jwt);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("loginTime", Date.now().toString());
-
-    // 🔔 notify navbar instantly
-    window.dispatchEvent(new Event("userLoggedIn"));
-
-    /* --------- CLEAR OVERLAYS -------- */
-    closeCart();
-    close();
-
-    /* ---------------- REDIRECT ---------------- */
-    router.replace("/product");
-
-  } catch {
-    setError("Server is not responding. Please try again.");
+    setLoading(false);
   }
 
-  setLoading(false);
-}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4">
 
@@ -75,7 +82,7 @@ export default function LoginPage() {
             Welcome Back 👋
           </h1>
           <p className="text-gray-500 text-sm">
-            Sign in to continue to your account
+            Sign in using your username or email
           </p>
         </div>
 
@@ -89,17 +96,18 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Email */}
+          {/* Username OR Email */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Email address
+              Username or Email
             </label>
             <input
-              type="email"
+              type="text"
               required
+              autoComplete="username"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Enter username or email"
               className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
@@ -114,6 +122,7 @@ export default function LoginPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -123,7 +132,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 text-sm font-medium"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -144,7 +153,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition active:scale-[0.98]"
+            className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
