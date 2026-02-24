@@ -9,9 +9,7 @@ import { useAuthPopup } from "../store/authPopupStore";
 export default function LoginPage() {
   const router = useRouter();
 
-  // close cart overlay
   const { closeCart } = useCartStore();
-  // close login popup
   const { close } = useAuthPopup();
 
   const [identifier, setIdentifier] = useState("");
@@ -22,11 +20,19 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (loading) return; // prevent double click
     setError("");
     setLoading(true);
 
-    // 🔧 normalize input (IMPORTANT)
-    let cleanIdentifier = identifier.trim().toLowerCase();
+    // normalize identifier
+    const cleanIdentifier = identifier.trim().toLowerCase();
+
+    if (!cleanIdentifier || !password) {
+      setError("Please enter username/email and password");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/login", {
@@ -43,29 +49,33 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid username/email or password");
+        // Better error mapping from Strapi
+        if (data?.message?.toLowerCase().includes("identifier")) {
+          setError("User not found");
+        } else if (data?.message?.toLowerCase().includes("password")) {
+          setError("Incorrect password");
+        } else {
+          setError(data.message || "Login failed");
+        }
         setLoading(false);
         return;
       }
 
-      /* ---------------- VERY IMPORTANT ---------------- */
-      // Save auth session for Navbar
+      /* ===== SAVE SESSION ===== */
       localStorage.setItem("token", data.jwt);
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("loginTime", Date.now().toString());
 
-      // 🔔 notify navbar instantly
+      // notify navbar
       window.dispatchEvent(new Event("userLoggedIn"));
 
-      /* --------- CLEAR OVERLAYS -------- */
       closeCart();
       close();
 
-      /* ---------------- REDIRECT ---------------- */
       router.replace("/product");
 
-    } catch {
-      setError("Server is not responding. Please try again.");
+    } catch (err) {
+      setError("Unable to connect to server");
     }
 
     setLoading(false);
@@ -86,7 +96,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Error Box */}
+        {/* Error */}
         {error && (
           <div className="bg-red-100 text-red-600 text-sm p-3 rounded-lg text-center">
             {error}
@@ -96,7 +106,7 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Username OR Email */}
+          {/* Username or Email */}
           <div>
             <label className="text-sm font-medium text-gray-700">
               Username or Email
@@ -139,14 +149,14 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Forgot password */}
+          {/* 🔥 REAL FORGOT PASSWORD LINK */}
           <div className="text-right text-sm">
-            <span className="text-gray-500">
-              Forgot password?{" "}
-              <span className="text-indigo-600 cursor-not-allowed">
-                Reset coming soon
-              </span>
-            </span>
+            <Link
+              href="/forgot-password"
+              className="text-indigo-600 hover:underline font-medium"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           {/* Submit */}

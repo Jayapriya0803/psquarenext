@@ -12,20 +12,6 @@ function getImageUrl(product: any) {
   return `${process.env.NEXT_PUBLIC_STRAPI_URL}${url}`;
 }
 
-/* ---------- Description ---------- */
-function getDescription(desc: any) {
-  if (!desc) return "";
-  try {
-    return desc
-      .map((block: any) =>
-        block.children.map((child: any) => child.text).join("")
-      )
-      .join(" ");
-  } catch {
-    return "";
-  }
-}
-
 export default function ProductCard({ product }: any) {
   const image = getImageUrl(product);
 
@@ -38,9 +24,10 @@ export default function ProductCard({ product }: any) {
   const itemData = {
     id: product.id,
     name: product.title,
-    description: getDescription(product.description),
+    description: product.description,
     price: product.price,
     image,
+    unit: product.unit,
     qty: 1,
   };
 
@@ -90,12 +77,12 @@ export default function ProductCard({ product }: any) {
       </h3>
 
       <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-        {getDescription(product.description)}
+        {product.description}
       </p>
 
       <div className="flex items-center justify-between mt-2">
         <p className="font-bold text-green-700">₹{product.price}</p>
-
+        <p className="font-bold text-green-700">price per {product.unit}</p>
         {qty === 0 ? (
           <button
             onClick={handleAdd}

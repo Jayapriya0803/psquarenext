@@ -2,6 +2,7 @@ import { getProducts } from "@/lib/products";
 import ProductCard from "./product-card";
 import CategoryBar from "./category-bar";
 import CartIcon from "@/components/cartIcon";
+import FloatingCart from "@/components/floatingcart";
 
 export default async function ProductPage() {
   const products = await getProducts();
@@ -34,6 +35,7 @@ export default async function ProductPage() {
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+      <FloatingCart />
     </div>
   );
 }

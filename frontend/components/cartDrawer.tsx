@@ -1,6 +1,8 @@
 "use client";
 
 import { useCartStore } from "@/app/store/cartStore";
+import Link from "next/dist/client/link";
+
 
 export default function CartDrawer() {
   const {
@@ -96,10 +98,13 @@ export default function CartDrawer() {
               <span className="text-green-700">₹{grandTotal.toFixed(2)}</span>
             </div>
 
-            <button className="mt-3 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700">
-              Checkout
-            </button>
-
+          <Link
+        href="/checkout"
+        onClick={closeCart}
+        className="mt-3 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 text-center block"
+        >
+        Proceed to Checkout
+          </Link>
             <button
               onClick={clearCart}
               className="mt-2 w-full border py-2 rounded-xl hover:bg-gray-50"
