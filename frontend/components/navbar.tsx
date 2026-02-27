@@ -15,22 +15,28 @@ const [user, setUser] = useState<any>(null);
 
 const router = useRouter();
 const pathname = usePathname();
-
 const clearCart = useCartStore((state) => state.clearCart);
+
+/* ---------- read user safely ---------- */
+const getStoredUser = () => {
+try {
+const savedUser = localStorage.getItem("user");
+return savedUser ? JSON.parse(savedUser) : null;
+} catch (err) {
+console.error("Error parsing stored user:", err);
+return null;
+}
+};
 
 /* ---------------- LOGOUT ---------------- */
 const handleLogout = () => {
-// clear authentication
 localStorage.removeItem("token");
 localStorage.removeItem("user");
 localStorage.removeItem("loginTime");
 
-// ⭐ CLEAR CART (VERY IMPORTANT)
 clearCart();
-
 setUser(null);
 
-// notify entire app
 window.dispatchEvent(new Event("userLoggedOut"));
 
 router.replace("/login");
@@ -39,46 +45,45 @@ router.replace("/login");
 
 /* ---------------- SESSION CHECK ---------------- */
 const checkSession = () => {
-const savedUser = localStorage.getItem("user");
-const loginTime = localStorage.getItem("loginTime");
 const token = localStorage.getItem("token");
+const loginTime = localStorage.getItem("loginTime");
 
 // not logged in
-if (!savedUser || !loginTime || !token) {
-  clearCart(); // ⭐ auto clear cart if session missing
+if (!token || !loginTime) {
+  clearCart();
   setUser(null);
   return;
 }
 
-// session expired
+// expired session
 if (Date.now() - Number(loginTime) > SESSION_EXPIRY) {
   handleLogout();
   return;
 }
 
-// safe parse
-try {
-  const parsedUser = JSON.parse(savedUser);
-  setUser(parsedUser);
-} catch {
-  localStorage.removeItem("user");
-  localStorage.removeItem("loginTime");
-  clearCart();
-  setUser(null);
+// restore user
+const storedUser = getStoredUser();
+if (storedUser) {
+  setUser(storedUser);
 }
-
 };
 
-/* ---- CHECK ON PAGE CHANGE ---- */
+/* ---- FIRST LOAD ---- */
+useEffect(() => {
+checkSession();
+}, []);
+
+/* ---- PAGE CHANGE ---- */
 useEffect(() => {
 checkSession();
 }, [pathname]);
 
-/* ---- LISTEN GLOBAL EVENTS ---- */
+/* ---- GLOBAL EVENTS ---- */
 useEffect(() => {
 window.addEventListener("userLoggedIn", checkSession);
 window.addEventListener("userLoggedOut", checkSession);
 window.addEventListener("focus", checkSession);
+
 
 return () => {
   window.removeEventListener("userLoggedIn", checkSession);
@@ -113,6 +118,14 @@ return ( <header className="sticky top-0 z-50 backdrop-blur bg-white/90 shadow-s
 
       {user ? (
         <div className="flex items-center gap-4">
+
+          <Link
+            href="/orders"
+            className="text-gray-700 hover:text-green-600 transition font-medium"
+          >
+            My Orders
+          </Link>
+
           <span className="text-green-600 font-medium">
             Welcome, {user.username}
           </span>
@@ -168,6 +181,14 @@ return ( <header className="sticky top-0 z-50 backdrop-blur bg-white/90 shadow-s
             <p className="text-green-600 font-semibold mb-2">
               Welcome, {user.username}
             </p>
+
+            <Link
+              href="/orders"
+              onClick={() => setMenuOpen(false)}
+              className="block w-full py-2 rounded-lg bg-gray-100 text-gray-800 mb-2"
+            >
+              My Orders
+            </Link>
 
             <button
               onClick={() => {
