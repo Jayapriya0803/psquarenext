@@ -3,7 +3,11 @@ import { getHomePage } from "@/lib/home";
 import { getStrapiMediaUrl } from "@/lib/getStrapiMediaUrl";
 import GoogleReviews from "@/components/googlereview";
 import Footer from "@/components/footer"; 
-
+export const metadata = {
+  title: "P Square Enterprises | Industrial Safety Gloves",
+  description:
+    "Leading manufacturer of cotton knitted gloves and PPE safety products.",
+};
 export default async function HomePage() {
   const response = await getHomePage();
 
