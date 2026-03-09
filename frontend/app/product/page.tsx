@@ -15,7 +15,9 @@ export default async function ProductPage() {
 
         {/* Row: title + cart */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">PSquare Store</h1>
+          <h1 className="text-2xl font-bold">
+Industrial Safety Gloves & PPE Products
+</h1>
           <CartIcon />
         </div>
 
