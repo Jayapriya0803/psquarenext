@@ -3,7 +3,6 @@ import Navbar from "../components/navbar";
 import Providers from "./providers";
 import CartDrawer from "@/components/cartDrawer";
 import LoginPopup from "@/components/loginPopup";
-export const metadata = {
   export const metadata = {
   title: "Cotton Knitted Gloves Manufacturer & PPE Products Supplier | P Square Enterprises India",
   description:
