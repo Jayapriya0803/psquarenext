@@ -18,68 +18,75 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+ async function handleSubmit(e: React.FormEvent) {
+e.preventDefault();
 
-    if (loading) return; // prevent double click
-    setError("");
-    setLoading(true);
+if (loading) return; // prevent double click
+setError("");
+setLoading(true);
 
-    // normalize identifier
-    const cleanIdentifier = identifier.trim().toLowerCase();
+// normalize identifier
+const cleanIdentifier = identifier.trim().toLowerCase();
 
-    if (!cleanIdentifier || !password) {
-      setError("Please enter username/email and password");
-      setLoading(false);
-      return;
-    }
+if (!cleanIdentifier || !password) {
+setError("Please enter username/email and password");
+setLoading(false);
+return;
+}
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          identifier: cleanIdentifier,
-          password,
-        }),
-      });
+try {
+const res = await fetch("/api/login", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify({
+identifier: cleanIdentifier,
+password,
+}),
+});
 
-      const data = await res.json();
+const data = await res.json();
 
-      if (!res.ok) {
-        // Better error mapping from Strapi
-        if (data?.message?.toLowerCase().includes("identifier")) {
-          setError("User not found");
-        } else if (data?.message?.toLowerCase().includes("password")) {
-          setError("Incorrect password");
-        } else {
-          setError(data.message || "Login failed");
-        }
-        setLoading(false);
-        return;
-      }
-
-      /* ===== SAVE SESSION ===== */
-      localStorage.setItem("token", data.jwt);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("loginTime", Date.now().toString());
-
-      // notify navbar
-      window.dispatchEvent(new Event("userLoggedIn"));
-
-      closeCart();
-      close();
-
-      router.replace("/product");
-
-    } catch (err) {
-      setError("Unable to connect to server");
-    }
-
-    setLoading(false);
+if (!res.ok) {
+  if (data?.message?.toLowerCase().includes("identifier")) {
+    setError("User not found");
+  } else if (data?.message?.toLowerCase().includes("password")) {
+    setError("Incorrect password");
+  } else {
+    setError(data.message || "Login failed");
   }
+  setLoading(false);
+  return;
+}
+
+/* ===== SAVE SESSION ===== */
+localStorage.setItem("token", data.jwt);
+localStorage.setItem("user", JSON.stringify(data.user));
+localStorage.setItem("loginTime", Date.now().toString());
+
+// notify navbar
+window.dispatchEvent(new Event("userLoggedIn"));
+
+closeCart();
+close();
+
+/* ===== ADMIN USERNAME CHECK ===== */
+const username = data?.user?.username?.toLowerCase();
+
+if (username === "psquare") {
+  router.replace("/admin");
+} else {
+  router.replace("/product");
+}
+
+} catch (err) {
+setError("Unable to connect to server");
+}
+
+setLoading(false);
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4">
