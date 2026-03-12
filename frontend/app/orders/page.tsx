@@ -21,13 +21,12 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Convert UTC → IST
   const formatDateTime = (dateString?: string) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
       day: "2-digit",
-      month: "long",
+      month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -35,40 +34,28 @@ export default function OrdersPage() {
     });
   };
 
-  // ⭐ CANCEL ORDER (now uses order id only)
   const cancelOrder = async (order: Order) => {
-    const confirmCancel = confirm("Are you sure you want to cancel this order?");
-    if (!confirmCancel) return;
+    if (!confirm("Cancel this order?")) return;
 
     try {
       const res = await fetch("/api/cancel-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: order.id }),
       });
 
-      const data = await res.json();
-
       if (res.ok) {
-        alert("Your order cancelled");
-
-        // update only selected order
         setOrders((prev) =>
           prev.map((o) =>
             o.id === order.id ? { ...o, orderStatus: "cancelled" } : o
           )
         );
-      } else {
-        alert(data.message || "Cancel failed");
       }
     } catch {
-      alert("Server not responding");
+      alert("Server error");
     }
   };
 
-  // Load Orders
   useEffect(() => {
     async function loadOrders() {
       try {
@@ -87,6 +74,7 @@ export default function OrdersPage() {
       } catch {
         console.log("Failed to load orders");
       }
+
       setLoading(false);
     }
 
@@ -98,7 +86,7 @@ export default function OrdersPage() {
 
   if (!orders.length)
     return (
-      <div className="p-10 text-center">
+      <div className="text-center p-10">
         <h2 className="text-xl font-semibold">No orders yet</h2>
         <p className="text-gray-500 mt-2">
           Start shopping to see your orders here.
@@ -108,67 +96,94 @@ export default function OrdersPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+
+      <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
 
       <div className="space-y-6">
+
         {orders.map((order) => (
           <div
             key={order.id}
-            className="border rounded-xl p-5 shadow-sm bg-white"
+            className="border rounded-lg shadow-sm bg-white"
           >
-            <div className="flex justify-between items-start mb-3">
+
+            {/* Order Header */}
+            <div className="bg-gray-50 p-4 flex flex-wrap justify-between text-sm border-b">
+
               <div>
-                <p className="font-semibold text-lg">
-                  Order #{order.id}
-                </p>
-
-                <p className="text-sm text-gray-500">
-                  Status: {order.orderStatus}
-                </p>
-
-                <p className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded mt-1 inline-block">
-                  Placed: {formatDateTime(order.createdAt)}
-                </p>
+                <p className="text-gray-500">ORDER PLACED</p>
+                <p>{formatDateTime(order.createdAt)}</p>
               </div>
 
-              <div className="text-right">
-                <div className="font-bold text-green-700 text-lg">
-                  ₹{order.total ?? 0}
-                </div>
+              <div>
+                <p className="text-gray-500">TOTAL</p>
+                <p className="font-semibold">₹{order.total ?? 0}</p>
+              </div>
 
-                {(order.orderStatus || "").toLowerCase() === "pending" && (
-                  <button
-                    onClick={() => cancelOrder(order)}
-                    className="mt-2 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded"
-                  >
-                    Cancel Order
-                  </button>
-                )}
+              <div>
+                <p className="text-gray-500">ORDER ID</p>
+                <p>#{order.id}</p>
+              </div>
+
+              <div>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold
+                  ${
+                    order.orderStatus === "pending"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : order.orderStatus === "cancelled"
+                      ? "bg-red-100 text-red-600"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {order.orderStatus}
+                </span>
               </div>
             </div>
 
-            <table className="w-full text-sm border mt-3">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2 border text-left">Product</th>
-                  <th className="p-2 border text-left">Description</th>
-                  <th className="p-2 border">Qty</th>
-                  <th className="p-2 border">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.items?.map((item, i) => (
-                  <tr key={`${order.id}-${i}`}>
-                    <td className="border p-2">{item.name}</td>
-                    <td className="border p-2">{item.description}</td>
-                    <td className="border p-2 text-center">{item.qty}</td>
-                    <td className="border p-2 text-center">₹{item.price}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Products */}
+            <div className="p-4 space-y-4">
+
+              {order.items?.map((item, i) => (
+                <div
+                  key={`${order.id}-${i}`}
+                  className="flex justify-between items-center border-b pb-3"
+                >
+
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-gray-500 text-sm">
+                      {item.description}
+                    </p>
+                  </div>
+
+                  <div className="text-sm text-gray-600">
+                    Qty: {item.qty}
+                  </div>
+
+                  <div className="font-semibold">
+                    ₹{item.price}
+                  </div>
+                </div>
+              ))}
+
+              {/* Cancel button */}
+              {(order.orderStatus || "").toLowerCase() === "pending" && (
+                <div className="text-right pt-2">
+                  <button
+                    onClick={() => cancelOrder(order)}
+                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded"
+                  >
+                    Cancel Order
+                  </button>
+                </div>
+              )}
+
+            </div>
+
           </div>
         ))}
+
       </div>
     </div>
   );

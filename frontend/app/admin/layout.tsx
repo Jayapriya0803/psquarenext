@@ -11,7 +11,9 @@ export default function AdminLayout({ children }: any) {
 
         <nav className="flex flex-col space-y-3">
           <Link href="/admin">Dashboard</Link>
-          <Link href="/admin/products">Products</Link>
+            <Link href="/admin/production">Production Entry</Link>
+              <Link href="/admin/despatch">Despatch Entry</Link>
+              <Link href="/admin/stock">Stock status</Link>
           <Link href="/admin/orders">Orders</Link>
           <Link href="/admin/contact">Contact Messages</Link>
         </nav>

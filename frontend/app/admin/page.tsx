@@ -43,31 +43,43 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-2 gap-6 max-w-xl">
 
-        <div className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer">
+        <div
+          onClick={() => router.push("/admin/orders")}
+          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
+        >
           <h2 className="font-semibold">Orders</h2>
           <p className="text-sm text-gray-500">
             Manage customer orders
           </p>
         </div>
 
-        <div className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer">
-          <h2 className="font-semibold">Products</h2>
+        <div
+          onClick={() => router.push("/admin/production")}
+          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
+        >
+          <h2 className="font-semibold">Production</h2>
           <p className="text-sm text-gray-500">
-            Manage product catalog
+            Add daily production
           </p>
         </div>
 
-        <div className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer">
-          <h2 className="font-semibold">Customers</h2>
+        <div
+          onClick={() => router.push("/admin/despatch")}
+          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
+        >
+          <h2 className="font-semibold">Despatch</h2>
           <p className="text-sm text-gray-500">
-            View registered users
+            Add daily despatch
           </p>
         </div>
 
-        <div className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer">
-          <h2 className="font-semibold">Settings</h2>
+        <div
+          onClick={() => router.push("/admin/stock")}
+          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
+        >
+          <h2 className="font-semibold">Stock</h2>
           <p className="text-sm text-gray-500">
-            Configure admin settings
+            View current stock
           </p>
         </div>
 
