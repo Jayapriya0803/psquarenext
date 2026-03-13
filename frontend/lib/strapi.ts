@@ -7,8 +7,8 @@ export async function fetchFromStrapi(
   const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
   if (!STRAPI_URL) {
-    console.error("❌ NEXT_PUBLIC_STRAPI_URL missing in .env");
-    return null; // DO NOT throw error in Next.js server components
+    console.error("NEXT_PUBLIC_STRAPI_URL missing");
+    return null;
   }
 
   const queryString = query
@@ -17,16 +17,19 @@ export async function fetchFromStrapi(
 
   const url = `${STRAPI_URL}${path}${queryString ? `?${queryString}` : ""}`;
 
-  const res = await fetch(url, {
-    next: {
-      revalidate: 60,
-    },
-  });
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+    });
 
-  if (!res.ok) {
-    console.error("Strapi fetch failed:", url);
-    return null; // important
+    if (!res.ok) {
+      console.error("Strapi fetch failed:", res.status, url);
+      return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("Strapi connection error:", error);
+    return null;
   }
-
-  return res.json();
 }
