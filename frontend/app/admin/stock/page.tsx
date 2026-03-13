@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function StockPage() {
+export default function StockPage(){
 
 const [stock,setStock] = useState<any[]>([]);
 
@@ -10,24 +10,24 @@ useEffect(()=>{
 
 async function loadStock(){
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
-const prodRes = await fetch(`${API}/api/productions`);
+// fetch production
+const prodRes = await fetch(`${STRAPI_URL}/api/productions`);
 const prodData = await prodRes.json();
 
-const desRes = await fetch(`${API}/api/despatches`);
+// fetch despatch
+const desRes = await fetch(`${STRAPI_URL}/api/despatches`);
 const desData = await desRes.json();
 
 let result:any = {};
 
-// Production
-prodData.data.forEach((p:any)=>{
+// production loop
+(prodData.data || []).forEach((p:any)=>{
 
-const item = p.attributes ? p.attributes : p;
+const item = p.attributes || p;
 
-if(!item.gsm) return;
-
-const key = item.gsm + "-" + item.color + "-" + item.unit;
+const key = `${item.gsm}-${item.color}-${item.unit}`;
 
 if(!result[key]){
 result[key] = {
@@ -39,19 +39,16 @@ despatch:0
 };
 }
 
-result[key].production += item.quantity || 0;
+result[key].production += Number(item.quantity) || 0;
 
 });
 
+// despatch loop
+(desData.data || []).forEach((d:any)=>{
 
-// Despatch
-desData.data.forEach((d:any)=>{
+const item = d.attributes || d;
 
-const item = d.attributes ? d.attributes : d;
-
-if(!item.gsm) return;
-
-const key = item.gsm + "-" + item.color + "-" + item.unit;
+const key = `${item.gsm}-${item.color}-${item.unit}`;
 
 if(!result[key]){
 result[key] = {
@@ -63,10 +60,11 @@ despatch:0
 };
 }
 
-result[key].despatch += item.quantity || 0;
+result[key].despatch += Number(item.quantity) || 0;
 
 });
 
+// calculate balance
 const finalStock = Object.values(result).map((i:any)=>({
 ...i,
 balance:i.production - i.despatch
@@ -84,12 +82,13 @@ return(
 
 <div className="p-8">
 
-<h1 className="text-2xl font-bold mb-6">Stock Details</h1>
+<h1 className="text-2xl font-bold mb-6">
+Stock Details
+</h1>
 
 <table className="border w-full">
 
 <thead className="bg-gray-100">
-
 <tr>
 <th className="p-2">GSM</th>
 <th className="p-2">Color</th>
@@ -98,23 +97,28 @@ return(
 <th className="p-2">Despatch</th>
 <th className="p-2">Balance</th>
 </tr>
-
 </thead>
 
 <tbody>
 
-{stock.map((s:any,i)=>(
+{stock.length === 0 ? (
+<tr>
+<td colSpan={6} className="text-center p-4">
+No stock data
+</td>
+</tr>
+) : (
+stock.map((s:any,i)=>(
 <tr key={i} className="border-t">
-
 <td className="p-2">{s.gsm}</td>
 <td className="p-2">{s.color}</td>
 <td className="p-2">{s.unit}</td>
 <td className="p-2">{s.production}</td>
 <td className="p-2">{s.despatch}</td>
 <td className="p-2 font-semibold">{s.balance}</td>
-
 </tr>
-))}
+))
+)}
 
 </tbody>
 
