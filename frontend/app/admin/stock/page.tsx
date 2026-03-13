@@ -10,10 +10,12 @@ useEffect(()=>{
 
 async function loadStock(){
 
-const prodRes = await fetch("http://localhost:1337/api/productions");
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+const prodRes = await fetch(`${API}/api/productions`);
 const prodData = await prodRes.json();
 
-const desRes = await fetch("http://localhost:1337/api/despatches");
+const desRes = await fetch(`${API}/api/despatches`);
 const desData = await desRes.json();
 
 let result:any = {};
@@ -64,7 +66,6 @@ despatch:0
 result[key].despatch += item.quantity || 0;
 
 });
-
 
 const finalStock = Object.values(result).map((i:any)=>({
 ...i,
