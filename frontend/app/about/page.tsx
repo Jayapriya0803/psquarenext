@@ -9,14 +9,19 @@ export const metadata = {
     "P Square Enterprises is a trusted manufacturer and supplier of cotton knitted gloves and industrial safety PPE products in India.",
 };
 
+export const dynamic = "force-dynamic"; // 🚀 VERY IMPORTANT
+
 export default async function AboutPage() {
   const response = await getAboutUs();
   const about = response?.data;
 
+  // ✅ SAFE fallback
   if (!about) {
+    console.error("❌ About missing:", response);
+
     return (
       <main className="p-10 text-center">
-        <p>About Us not found</p>
+        <p>Loading...</p>
       </main>
     );
   }
@@ -55,11 +60,8 @@ export default async function AboutPage() {
         </div>
       </header>
 
-      {/* COMPANY CONTENT */}
-      <section
-        className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-14 items-center"
-        aria-labelledby="company-info"
-      >
+      {/* CONTENT */}
+      <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-14 items-center">
 
         {/* IMAGE */}
         {imageUrl && (
@@ -68,19 +70,16 @@ export default async function AboutPage() {
               src={imageUrl}
               alt={altText}
               fill
-              sizes="(max-width:768px) 100vw, 50vw"
               className="object-cover"
               priority
+              unoptimized
             />
           </div>
         )}
 
         {/* DETAILS */}
         <article className="bg-white rounded-2xl shadow-lg p-8">
-          <h2
-            id="company-info"
-            className="text-2xl font-semibold text-gray-900"
-          >
+          <h2 className="text-2xl font-semibold text-gray-900">
             {about.companyname}
           </h2>
 
@@ -89,8 +88,7 @@ export default async function AboutPage() {
               <strong className="text-blue-700">
                 {about.yearsofexperience}+ years
               </strong>{" "}
-              of experience in manufacturing and supplying industrial safety
-              products.
+              of experience in manufacturing and supplying industrial safety products.
             </p>
           )}
 
@@ -102,10 +100,8 @@ export default async function AboutPage() {
               </h3>
 
               <ul className="mt-4 space-y-2 list-disc list-inside text-gray-700">
-                {about.service.map((item: any, index: number) => (
-                  <li key={index}>
-                    {item.title || item.point}
-                  </li>
+                {about.service.map((item: any, i: number) => (
+                  <li key={i}>{item.title || item.point}</li>
                 ))}
               </ul>
             </>
@@ -119,8 +115,8 @@ export default async function AboutPage() {
               </h3>
 
               <ul className="mt-4 space-y-2 list-disc list-inside text-gray-700">
-                {about.point.map((item: any, index: number) => (
-                  <li key={index}>{item.point}</li>
+                {about.point.map((item: any, i: number) => (
+                  <li key={i}>{item.point}</li>
                 ))}
               </ul>
             </>
@@ -129,25 +125,14 @@ export default async function AboutPage() {
           {/* LOCATION */}
           {about.location && (
             <p className="mt-8 text-gray-700">
-              <strong className="text-gray-900">
-                Location:
-              </strong>{" "}
-              {about.location}
+              <strong>Location:</strong> {about.location}
             </p>
           )}
         </article>
 
       </section>
 
-      {/* DIVIDER */}
-      <div
-        className="h-24 bg-gradient-to-b from-slate-50 to-[#0B3C6F]"
-        aria-hidden="true"
-      />
-
-      {/* FOOTER */}
       <Footer />
-
     </main>
   );
 }
