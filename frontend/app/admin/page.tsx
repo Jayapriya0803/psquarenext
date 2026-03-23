@@ -27,64 +27,61 @@ export default function AdminDashboard() {
   }, [router]);
 
   if (!authorized) return null;
+return (
+  <div className="p-4 sm:p-8">
 
-  return (
-    <div className="p-8">
+    <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
+      Admin Dashboard
+    </h1>
 
-      <h1 className="text-3xl font-bold mb-6">
-        Admin Dashboard
-      </h1>
+    <p className="text-gray-600 mb-6 sm:mb-8">
+      Welcome to PSquare Admin Panel
+    </p>
 
-      <p className="text-gray-600 mb-8">
-        Welcome to PSquare Admin Panel
-      </p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-xl">
 
-      {/* Admin Sections */}
+      <div
+        onClick={() => router.push("/admin/orders")}
+        className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer active:scale-95 transition"
+      >
+        <h2 className="font-semibold">Orders</h2>
+        <p className="text-sm text-gray-500">
+          Manage customer orders
+        </p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-6 max-w-xl">
+      <div
+        onClick={() => router.push("/admin/production")}
+        className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer active:scale-95 transition"
+      >
+        <h2 className="font-semibold">Production</h2>
+        <p className="text-sm text-gray-500">
+          Add daily production
+        </p>
+      </div>
 
-        <div
-          onClick={() => router.push("/admin/orders")}
-          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
-        >
-          <h2 className="font-semibold">Orders</h2>
-          <p className="text-sm text-gray-500">
-            Manage customer orders
-          </p>
-        </div>
+      <div
+        onClick={() => router.push("/admin/despatch")}
+        className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer active:scale-95 transition"
+      >
+        <h2 className="font-semibold">Despatch</h2>
+        <p className="text-sm text-gray-500">
+          Add daily despatch
+        </p>
+      </div>
 
-        <div
-          onClick={() => router.push("/admin/production")}
-          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
-        >
-          <h2 className="font-semibold">Production</h2>
-          <p className="text-sm text-gray-500">
-            Add daily production
-          </p>
-        </div>
-
-        <div
-          onClick={() => router.push("/admin/despatch")}
-          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
-        >
-          <h2 className="font-semibold">Despatch</h2>
-          <p className="text-sm text-gray-500">
-            Add daily despatch
-          </p>
-        </div>
-
-        <div
-          onClick={() => router.push("/admin/stock")}
-          className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer"
-        >
-          <h2 className="font-semibold">Stock</h2>
-          <p className="text-sm text-gray-500">
-            View current stock
-          </p>
-        </div>
-
+      <div
+        onClick={() => router.push("/admin/stock")}
+        className="border rounded-lg p-5 hover:bg-gray-50 cursor-pointer active:scale-95 transition"
+      >
+        <h2 className="font-semibold">Stock</h2>
+        <p className="text-sm text-gray-500">
+          View current stock
+        </p>
       </div>
 
     </div>
-  );
+
+  </div>
+);
 }
