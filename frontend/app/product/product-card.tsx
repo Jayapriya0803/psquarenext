@@ -16,7 +16,7 @@ export default function ProductCard({ product }: any) {
   const image = getImageUrl(product);
 
   const { items, addItem, increase, decrease } = useCartStore();
-  const popup = useAuthPopup();
+  const popup = useAuthPopup(); // (optional, can remove if unused)
 
   const cartItem = items.find((i) => i.id === product.id);
   const qty = cartItem?.qty || 0;
@@ -31,32 +31,16 @@ export default function ProductCard({ product }: any) {
     qty: 1,
   };
 
-  /* ---------- LOGIN CHECK ---------- */
-  function requireLogin() {
-    const token = localStorage.getItem("token");
-
-    // NOT LOGGED IN
-    if (!token) {
-      popup.open("Please login to continue shopping");
-      return false;
-    }
-
-    return true;
-  }
-
-  /* ---------- ACTIONS ---------- */
+  /* ---------- ACTIONS (NO LOGIN CHECK) ---------- */
   function handleAdd() {
-    if (!requireLogin()) return;
     addItem(itemData);
   }
 
   function handleIncrease() {
-    if (!requireLogin()) return;
     increase(product.id);
   }
 
   function handleDecrease() {
-    if (!requireLogin()) return;
     decrease(product.id);
   }
 
@@ -82,7 +66,8 @@ export default function ProductCard({ product }: any) {
 
       <div className="flex items-center justify-between mt-2">
         <p className="font-bold text-green-700">₹{product.price}</p>
-        <p className="font-bold text-green-700">price per {product.unit}</p>
+        <p className="text-xs text-gray-500">per {product.unit}</p>
+
         {qty === 0 ? (
           <button
             onClick={handleAdd}

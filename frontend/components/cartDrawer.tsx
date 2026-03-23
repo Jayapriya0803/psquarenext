@@ -1,10 +1,11 @@
 "use client";
 
 import { useCartStore } from "@/app/store/cartStore";
-import Link from "next/dist/client/link";
-
+import { useRouter } from "next/navigation";
 
 export default function CartDrawer() {
+  const router = useRouter();
+
   const {
     items,
     isOpen,
@@ -20,16 +21,31 @@ export default function CartDrawer() {
   const gst = subtotal * 0.05; // 5% GST
   const grandTotal = subtotal + gst;
 
+  // ✅ LOGIN CHECK HANDLER
+  const handleCheckout = () => {
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      alert("Please login to continue");
+      closeCart();
+      router.push("/login");
+      return;
+    }
+
+    closeCart();
+    router.push("/checkout");
+  };
+
   if (!isOpen) return null;
 
   return (
     <>
       {/* Overlay */}
-    <div
-     onClick={closeCart}
+      <div
+        onClick={closeCart}
         className="fixed inset-0 bg-black/40 z-40"
         aria-hidden="true"
-    />
+      />
 
       {/* RIGHT SIDE DRAWER */}
       <div className="fixed top-0 right-0 h-full w-[90%] sm:w-[420px] bg-white z-50 shadow-2xl flex flex-col cart-slide">
@@ -98,13 +114,14 @@ export default function CartDrawer() {
               <span className="text-green-700">₹{grandTotal.toFixed(2)}</span>
             </div>
 
-          <Link
-        href="/checkout"
-        onClick={closeCart}
-        className="mt-3 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 text-center block"
-        >
-        Proceed to Checkout
-          </Link>
+            {/* ✅ UPDATED CHECKOUT BUTTON */}
+            <button
+              onClick={handleCheckout}
+              className="mt-3 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700"
+            >
+              Proceed to Checkout
+            </button>
+
             <button
               onClick={clearCart}
               className="mt-2 w-full border py-2 rounded-xl hover:bg-gray-50"
