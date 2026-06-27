@@ -102,20 +102,24 @@ return (
 <div className="bg-[#0B3C6F] text-white py-2 overflow-hidden w-full">
   <div
     className="flex whitespace-nowrap"
-    style={{
-      animation: "marquee 8s linear infinite",
-    }}
+    style={{ animation: "marquee 8s linear infinite" }}
   >
     {[...Array(5)].map((_, i) => (
-      <span key={i} className="inline-flex items-center gap-2 px-6 text-xs md:text-sm flex-shrink-0">
-        💼 Welcome Investors! Those who want to invest in P Square Enterprises —&nbsp;
-        <Link
-          href="/invest"
-          className="text-yellow-300 font-semibold underline underline-offset-2 hover:text-yellow-400 transition"
-        >
-          Click Here to Make a Payment →
-        </Link>
-        <span className="mx-6 text-white/30">★</span>
+      <span key={i} className="inline-flex items-center gap-2 px-4 flex-shrink-0">
+        {/* Short text on mobile, full text on desktop */}
+        <span className="text-xs md:hidden">
+          💼 Invest in P Square —&nbsp;
+          <Link href="/invest" className="text-yellow-300 font-semibold underline">
+            Click Here →
+          </Link>
+        </span>
+        <span className="text-sm hidden md:inline-flex items-center gap-2">
+          💼 Welcome Investors! Those who want to invest in P Square Enterprises —&nbsp;
+          <Link href="/invest" className="text-yellow-300 font-semibold underline underline-offset-2 hover:text-yellow-400 transition">
+            Click Here to Make a Payment →
+          </Link>
+        </span>
+        <span className="mx-4 text-white/30">★</span>
       </span>
     ))}
   </div>
