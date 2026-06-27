@@ -1,0 +1,50 @@
+{
+  "kind": "singleType",
+  "collectionName": "about_uses",
+  "info": {
+    "singularName": "about-us",
+    "pluralName": "about-uses",
+    "displayName": "About us"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "companyname": {
+      "type": "string"
+    },
+    "aboutheading": {
+      "type": "string"
+    },
+    "yearsofexperience": {
+      "type": "integer"
+    },
+    "factory": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "location": {
+      "type": "string"
+    },
+    "service": {
+      "type": "component",
+      "component": "components.about-services",
+      "repeatable": true
+    },
+    "point": {
+      "type": "component",
+      "component": "components.about-highlights",
+      "repeatable": true
+    },
+    "aboutdescription": {
+      "type": "text"
+    }
+  }
+}

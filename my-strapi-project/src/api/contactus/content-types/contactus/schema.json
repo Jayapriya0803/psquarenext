@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contactuses",
+  "info": {
+    "singularName": "contactus",
+    "pluralName": "contactuses",
+    "displayName": "contactus"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "companyname": {
+      "type": "string"
+    },
+    "mobileno": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}

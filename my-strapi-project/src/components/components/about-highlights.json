@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_components_about_highlights",
+  "info": {
+    "displayName": "about.highlights"
+  },
+  "options": {},
+  "attributes": {
+    "point": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

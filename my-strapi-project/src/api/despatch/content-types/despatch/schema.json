@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "despatches",
+  "info": {
+    "singularName": "despatch",
+    "pluralName": "despatches",
+    "displayName": "despatch"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "descrip": {
+      "type": "string"
+    },
+    "gsm": {
+      "type": "enumeration",
+      "enum": [
+        "GSM40",
+        "GSM50",
+        "GSM60",
+        "GSM70",
+        "GSM80",
+        "COTTONWASTE"
+      ]
+    },
+    "color": {
+      "type": "enumeration",
+      "enum": [
+        "blue",
+        "grey",
+        "greenishblue",
+        "white"
+      ]
+    },
+    "date": {
+      "type": "date"
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "unit": {
+      "type": "enumeration",
+      "enum": [
+        "pairs",
+        "boxes",
+        "kg",
+        "nos."
+      ]
+    }
+  }
+}
