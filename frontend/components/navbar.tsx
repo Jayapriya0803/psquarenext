@@ -48,20 +48,17 @@ const checkSession = () => {
 const token = localStorage.getItem("token");
 const loginTime = localStorage.getItem("loginTime");
 
-// not logged in
 if (!token || !loginTime) {
   clearCart();
   setUser(null);
   return;
 }
 
-// expired session
 if (Date.now() - Number(loginTime) > SESSION_EXPIRY) {
   handleLogout();
   return;
 }
 
-// restore user
 const storedUser = getStoredUser();
 if (storedUser) {
   setUser(storedUser);
@@ -84,7 +81,6 @@ window.addEventListener("userLoggedIn", checkSession);
 window.addEventListener("userLoggedOut", checkSession);
 window.addEventListener("focus", checkSession);
 
-
 return () => {
   window.removeEventListener("userLoggedIn", checkSession);
   window.removeEventListener("userLoggedOut", checkSession);
@@ -99,121 +95,136 @@ pathname === path
 ? "text-green-600 font-semibold"
 : "text-gray-700 hover:text-green-600 transition";
 
-return ( <header className="sticky top-0 z-50 backdrop-blur bg-white/90 shadow-sm"> <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+return (
+  <header className="sticky top-0 z-50 shadow-sm">
 
-    {/* Logo */}
-    <Link href="/" className="flex items-center gap-3">
-      <Image src="/logo.png" alt="P Square" width={55} height={55} />
-      <span className="text-xl font-bold text-gray-900">
-        P Square Enterprises.
-      </span>
-    </Link>
-
-    {/* Desktop Menu */}
-    <div className="hidden md:flex items-center gap-8 text-sm">
-      <Link href="/" className={linkClass("/")}>Home</Link>
-      <Link href="/about" className={linkClass("/about")}>About</Link>
-      <Link href="/product" className={linkClass("/product")}>Products</Link>
-      <Link href="/contactus" className={linkClass("/contactus")}>Contact</Link>
-
-      {user ? (
-        <div className="flex items-center gap-4">
-
-          <Link
-            href="/orders"
-            className="text-gray-700 hover:text-green-600 transition font-medium"
-          >
-            My Orders
-          </Link>
-
-          <span className="text-green-600 font-medium">
-            Welcome, {user.username}
+    {/* INVESTOR MARQUEE BANNER */}
+    <div className="bg-[#0B3C6F] text-white py-2 overflow-hidden">
+      <div className="flex whitespace-nowrap animate-marquee">
+        {[...Array(3)].map((_, i) => (
+          <span key={i} className="inline-flex items-center gap-2 px-8 text-sm">
+            💼 Welcome Investors! Those who want to invest in P Square Enterprises —&nbsp;
+            <Link
+              href="/invest"
+              className="text-yellow-300 font-semibold underline underline-offset-2 hover:text-yellow-400 transition"
+            >
+              Click Here to Make a Payment →
+            </Link>
+            <span className="mx-8 text-white/30">★</span>
           </span>
-
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
-        <Link
-          href="/login"
-          className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
-        >
-          Login
-        </Link>
-      )}
+        ))}
+      </div>
     </div>
 
-    {/* Mobile Menu Button */}
-    <button
-      onClick={() => setMenuOpen(!menuOpen)}
-      className="md:hidden text-2xl text-gray-700"
-    >
-      {menuOpen ? <FaTimes /> : <FaBars />}
-    </button>
-  </nav>
+    <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between bg-white/90 backdrop-blur">
 
-  {/* Mobile Menu */}
-  {menuOpen && (
-    <div className="md:hidden bg-white shadow-lg rounded-b-xl px-6 py-6 space-y-4 text-center">
-      {[
-        ["/", "Home"],
-        ["/about", "About"],
-        ["/product", "Products"],
-        ["/contactus", "Contact"],
-      ].map(([path, label]) => (
-        <Link
-          key={path}
-          href={path}
-          className={`block text-lg ${linkClass(path)}`}
-          onClick={() => setMenuOpen(false)}
-        >
-          {label}
-        </Link>
-      ))}
+      {/* Logo */}
+      <Link href="/" className="flex items-center gap-3">
+        <Image src="/logo.png" alt="P Square" width={55} height={55} />
+        <span className="text-xl font-bold text-gray-900">
+          P Square Enterprises.
+        </span>
+      </Link>
 
-      <div className="pt-4 border-t">
+      {/* Desktop Menu */}
+      <div className="hidden md:flex items-center gap-8 text-sm">
+        <Link href="/" className={linkClass("/")}>Home</Link>
+        <Link href="/about" className={linkClass("/about")}>About</Link>
+        <Link href="/product" className={linkClass("/product")}>Products</Link>
+        <Link href="/contactus" className={linkClass("/contactus")}>Contact</Link>
+
         {user ? (
-          <>
-            <p className="text-green-600 font-semibold mb-2">
-              Welcome, {user.username}
-            </p>
-
+          <div className="flex items-center gap-4">
             <Link
               href="/orders"
-              onClick={() => setMenuOpen(false)}
-              className="block w-full py-2 rounded-lg bg-gray-100 text-gray-800 mb-2"
+              className="text-gray-700 hover:text-green-600 transition font-medium"
             >
               My Orders
             </Link>
-
+            <span className="text-green-600 font-medium">
+              Welcome, {user.username}
+            </span>
             <button
-              onClick={() => {
-                handleLogout();
-                setMenuOpen(false);
-              }}
-              className="w-full py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+              onClick={handleLogout}
+              className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
             >
               Logout
             </button>
-          </>
+          </div>
         ) : (
           <Link
             href="/login"
-            className="block w-full py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
-            onClick={() => setMenuOpen(false)}
+            className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
           >
             Login
           </Link>
         )}
       </div>
-    </div>
-  )}
-</header>
 
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="md:hidden text-2xl text-gray-700"
+      >
+        {menuOpen ? <FaTimes /> : <FaBars />}
+      </button>
+    </nav>
+
+    {/* Mobile Menu */}
+    {menuOpen && (
+      <div className="md:hidden bg-white shadow-lg rounded-b-xl px-6 py-6 space-y-4 text-center">
+        {[
+          ["/", "Home"],
+          ["/about", "About"],
+          ["/product", "Products"],
+          ["/contactus", "Contact"],
+        ].map(([path, label]) => (
+          <Link
+            key={path}
+            href={path}
+            className={`block text-lg ${linkClass(path)}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            {label}
+          </Link>
+        ))}
+
+        <div className="pt-4 border-t">
+          {user ? (
+            <>
+              <p className="text-green-600 font-semibold mb-2">
+                Welcome, {user.username}
+              </p>
+              <Link
+                href="/orders"
+                onClick={() => setMenuOpen(false)}
+                className="block w-full py-2 rounded-lg bg-gray-100 text-gray-800 mb-2"
+              >
+                My Orders
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="block w-full py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+              onClick={() => setMenuOpen(false)}
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
+    )}
+  </header>
 );
 };
 
