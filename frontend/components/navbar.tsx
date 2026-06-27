@@ -103,7 +103,7 @@ return (
   <div
     className="flex whitespace-nowrap"
     style={{
-      animation: "marquee 20s linear infinite",
+      animation: "marquee 8s linear infinite",
     }}
   >
     {[...Array(5)].map((_, i) => (
