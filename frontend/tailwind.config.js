@@ -8,14 +8,14 @@ export default {
   theme: {
     extend: {
       keyframes: {
-        marquee: {
-          "0%": { transform: "translateX(0%)" },
-          "100%": { transform: "translateX(-33.333%)" },
-        },
-      },
-      animation: {
-        marquee: "marquee 18s linear infinite",
-      },
+  marquee: {
+    "0%": { transform: "translateX(0%)" },
+    "100%": { transform: "translateX(-20%)" },
+  },
+},
+animation: {
+  marquee: "marquee 20s linear infinite",
+},
     },
   },
   plugins: [],

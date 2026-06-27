@@ -30,3 +30,7 @@
 .top-cart-animate {
   animation: slideFromTop 0.25s ease-out;
 }
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-20%); }
+}

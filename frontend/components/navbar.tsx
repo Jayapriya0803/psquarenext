@@ -99,22 +99,27 @@ return (
   <header className="sticky top-0 z-50 shadow-sm">
 
     {/* INVESTOR MARQUEE BANNER */}
-    <div className="bg-[#0B3C6F] text-white py-2 overflow-hidden">
-      <div className="flex whitespace-nowrap animate-marquee">
-        {[...Array(3)].map((_, i) => (
-          <span key={i} className="inline-flex items-center gap-2 px-8 text-sm">
-            💼 Welcome Investors! Those who want to invest in P Square Enterprises —&nbsp;
-            <Link
-              href="/invest"
-              className="text-yellow-300 font-semibold underline underline-offset-2 hover:text-yellow-400 transition"
-            >
-              Click Here to Make a Payment →
-            </Link>
-            <span className="mx-8 text-white/30">★</span>
-          </span>
-        ))}
-      </div>
-    </div>
+<div className="bg-[#0B3C6F] text-white py-2 overflow-hidden w-full">
+  <div
+    className="flex whitespace-nowrap"
+    style={{
+      animation: "marquee 20s linear infinite",
+    }}
+  >
+    {[...Array(5)].map((_, i) => (
+      <span key={i} className="inline-flex items-center gap-2 px-6 text-xs md:text-sm flex-shrink-0">
+        💼 Welcome Investors! Those who want to invest in P Square Enterprises —&nbsp;
+        <Link
+          href="/invest"
+          className="text-yellow-300 font-semibold underline underline-offset-2 hover:text-yellow-400 transition"
+        >
+          Click Here to Make a Payment →
+        </Link>
+        <span className="mx-6 text-white/30">★</span>
+      </span>
+    ))}
+  </div>
+</div>
 
     <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between bg-white/90 backdrop-blur">
 
